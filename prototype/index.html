@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fa">
+  <title>Narada — Agent quality, under control</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar">
+      <a href="#overview" class="brand" aria-label="Narada home">
+        <span class="brand-mark"><i></i><i></i><i></i></span>
+        <span class="brand-name">narada<span class="brand-beta">BETA</span></span>
+      </a>
+      <div class="workspace-switch"><span class="workspace-icon">N</span><span><b>Narada</b><small>Quality workspace</small></span><span class="chevron">⌄</span></div>
+      <div class="nav-label">CALL TESTING</div>
+      <nav class="nav-list" aria-label="Call testing">
+        <a class="nav-item active" href="#setup" data-page="setup"><span class="nav-icon">✎</span><span>Agent setup</span></a>
+        <a class="nav-item" href="#test-calls" data-page="test-calls"><span class="nav-icon">◇</span><span>Edge-case testing</span></a>
+        <a class="nav-item" href="#call-library" data-page="call-library"><span class="nav-icon">◷</span><span>Calls & recordings</span></a>
+        <a class="nav-item" href="#manual-call" data-page="manual-call"><span class="nav-icon">☎</span><span>Manual test call</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="usage-card"><div class="usage-head"><span>Test workspace</span><span class="usage-help">?</span></div><div class="usage-num">Prompt <small>not connected</small></div><div class="usage-track"><span style="width:12%"></span></div><small class="usage-caption">Demo mode · no calls placed</small><a href="#setup" data-page="setup">Set up agent <span>↗</span></a></div>
+        <div class="user-row"><div class="avatar">GN</div><div class="user-meta"><b>Ganesh</b><small>Admin</small></div><button class="icon-button user-menu" aria-label="User menu">···</button></div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button class="mobile-menu icon-button" id="mobileMenu" aria-label="Open navigation">☰</button>
+        <div class="breadcrumbs"><span>Workspace</span><b>/</b><strong id="crumb">Overview</strong><span class="demo-badge">DEMO DATA</span></div>
+      </header>
+      <section class="page-content" id="pageContent"></section>
+    </main>
+  </div>
+  <div class="toast-stack" id="toasts" aria-live="polite"></div>
+  <div class="modal-backdrop" id="modalBackdrop" hidden><section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"></section></div>
+  <script src="app.js"></script>
+</body>
+</html>
