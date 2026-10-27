@@ -1,0 +1,28 @@
+[project]
+name = "narada"
+version = "0.1.0"
+requires-python = ">=3.13"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["app", "tests"]
+exclude = ["__pycache__", ".venv", ".pytest_cache"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "tests", "main"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**/*.py" = ["B011", "E402"]
+# Seed scripts carry sample prompts as prose; wrapping them only hurts readability.
+"scripts/*.py" = ["E501"]

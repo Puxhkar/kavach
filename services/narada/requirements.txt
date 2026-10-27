@@ -1,0 +1,14 @@
+fastapi==0.141.1
+# Pinned explicitly: fastapi only requires starlette>=0.46.0, so an unpinned resolve can
+# land on a version carrying the BadHost path-poisoning CVE.
+starlette==1.6.0
+uvicorn[standard]==0.31.1
+pydantic==2.13.4
+pydantic-settings==2.10.1
+motor==3.7.1
+pymongo==4.13.2
+httpx==0.28.1
+openai==2.54.0
+# Multipart uploads (Call Guard live-call audio).
+python-multipart==0.0.20
+# Test-only deps live in requirements-dev.txt — the image installs this file only.
