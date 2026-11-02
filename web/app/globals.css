@@ -1,0 +1,537 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+/* ── Base: warm paper, navy ink, a fixed graph-paper grid ─────────────────────────────── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-main-bg text-ink antialiased;
+    background-image:
+      radial-gradient(circle at 0% 0%, rgba(253, 224, 71, 0.16), transparent 34%),
+      radial-gradient(circle at 100% 0%, rgba(91, 146, 229, 0.12), transparent 30%);
+    background-attachment: fixed;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.16) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.16) 1px, transparent 1px);
+    background-size: 34px 34px;
+    mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.95), rgba(0, 0, 0, 0.55));
+  }
+
+  ::selection {
+    background: #fde047;
+    color: #10213a;
+  }
+
+  audio {
+    border-radius: 999px;
+  }
+}
+
+/* ── Sketchbook components (utilities still win over these) ─────────────────────────── */
+@layer components {
+  /* Uppercase tracked labels. */
+  .kicker {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #475569;
+  }
+
+  .panel-title {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #546275;
+  }
+
+  /* A taped-on strip in a card's top-right corner. The card needs `relative`. */
+  .tape::before {
+    content: "";
+    position: absolute;
+    top: 12px;
+    right: 20px;
+    width: 62px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 2px dashed rgba(16, 33, 58, 0.22);
+    transform: rotate(7deg);
+    pointer-events: none;
+  }
+
+  /* Paper fills. */
+  .paper-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(252, 247, 239, 0.95));
+  }
+  .yellow-paper {
+    background: linear-gradient(180deg, rgba(255, 243, 187, 0.92), rgba(255, 255, 255, 0.96));
+  }
+  .blueprint-card {
+    background: linear-gradient(180deg, rgba(220, 235, 255, 0.9), rgba(255, 255, 255, 0.96));
+  }
+  .rose-paper {
+    background: linear-gradient(180deg, rgba(255, 225, 231, 0.9), rgba(255, 255, 255, 0.96));
+  }
+  .mint-paper {
+    background: linear-gradient(180deg, rgba(217, 236, 210, 0.85), rgba(255, 255, 255, 0.96));
+  }
+
+  /* List rows: light 2px outline; selected = ink outline, yellow paper and a hard shadow. */
+  .sketch-tile {
+    position: relative;
+    border: 2px solid rgba(16, 33, 58, 0.14);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.94);
+    transition:
+      transform 140ms ease,
+      box-shadow 140ms ease,
+      border-color 140ms ease,
+      rotate 140ms ease;
+  }
+  .sketch-tile:hover {
+    border-color: rgba(16, 33, 58, 0.4);
+  }
+  .sketch-tile[aria-current]:not([aria-current="false"]),
+  .sketch-tile.is-active {
+    border-color: #10213a;
+    background: linear-gradient(180deg, rgba(255, 245, 196, 0.98), rgba(255, 255, 255, 0.98));
+    box-shadow: 5px 5px 0 rgba(16, 33, 58, 0.12);
+  }
+
+  /* Gentle alternating tilt for tiles in a list; they straighten on hover / when selected. */
+  @media (prefers-reduced-motion: no-preference) {
+    .tilt-list > :nth-child(odd) .sketch-tile,
+    .tilt-list > .sketch-tile:nth-child(odd) {
+      rotate: -0.4deg;
+    }
+    .tilt-list > :nth-child(even) .sketch-tile,
+    .tilt-list > .sketch-tile:nth-child(even) {
+      rotate: 0.4deg;
+    }
+    .tilt-list .sketch-tile:hover,
+    .tilt-list .sketch-tile:focus-visible,
+    .tilt-list .sketch-tile[aria-current]:not([aria-current="false"]),
+    .tilt-list .sketch-tile.is-active {
+      rotate: 0deg;
+      transform: translateY(-1px);
+    }
+  }
+
+  /* Pill tabs / filters: active = ink fill, white text. */
+  .dash-tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border-radius: 999px;
+    border: 2px solid rgba(16, 33, 58, 0.16);
+    background: rgba(255, 255, 255, 0.9);
+    color: #10213a;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+      background 140ms ease,
+      border-color 140ms ease;
+  }
+  .dash-tab:hover {
+    border-color: rgba(16, 33, 58, 0.45);
+  }
+  .dash-tab[aria-selected="true"],
+  .dash-tab[aria-current]:not([aria-current="false"]),
+  .dash-tab.is-active {
+    background: #10213a;
+    border-color: #10213a;
+    color: #fff;
+  }
+
+  /* Small rounded status chips. */
+  .status-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    border: 1.5px solid rgba(16, 33, 58, 0.16);
+    background: rgba(255, 255, 255, 0.9);
+    font-size: 12px;
+    font-weight: 700;
+    color: #10213a;
+    white-space: nowrap;
+  }
+
+  /* Conversation bubbles. */
+  .chat-bubble {
+    border-radius: 18px;
+    border: 1.5px solid rgba(16, 33, 58, 0.14);
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 4px 4px 0 rgba(16, 33, 58, 0.06);
+    color: #10213a;
+  }
+  .chat-bubble.from-ai {
+    background: rgba(220, 235, 255, 0.75);
+    border-top-left-radius: 6px;
+  }
+  .chat-bubble.from-person {
+    background: rgba(255, 240, 171, 0.7);
+    border-top-right-radius: 6px;
+  }
+
+  /* Dashed paper box for empty states. */
+  .empty-paper {
+    border-radius: 22px;
+    border: 2px dashed rgba(16, 33, 58, 0.2);
+    background: rgba(255, 255, 255, 0.65);
+  }
+
+  /* Inner "note" boxes inside cards (summary facts, hints). */
+  .note-box {
+    border-radius: 16px;
+    border: 1.5px solid rgba(16, 33, 58, 0.12);
+  }
+
+  /* Chunky sketch buttons used outside the Button component (landing page links). */
+  .sketch-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 0 20px;
+    border-radius: 14px;
+    border: 2px solid #0f172a;
+    color: #10213a;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    box-shadow: 4px 4px 0 #0f172a;
+    transition:
+      transform 150ms ease,
+      box-shadow 150ms ease;
+  }
+  .sketch-btn:hover {
+    box-shadow: 2px 2px 0 #0f172a;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .sketch-btn:hover {
+      transform: translate(2px, 2px);
+    }
+  }
+  .sketch-btn:focus-visible {
+    outline: 3px solid #10213a;
+    outline-offset: 3px;
+  }
+
+  /* Landing page marquee. */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    gap: 40px;
+    padding: 13px 20px;
+    white-space: nowrap;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .marquee-track {
+      animation: marquee 32s linear infinite;
+    }
+  }
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Landing page motion (all of it off under prefers-reduced-motion) ─────────────────── */
+@keyframes bubble-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes float-y {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -10px;
+  }
+}
+@keyframes wave-bar {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: rotate(-8deg) scale(1.6);
+  }
+  70% {
+    opacity: 1;
+    transform: rotate(-8deg) scale(0.94);
+  }
+  100% {
+    opacity: 1;
+    transform: rotate(-8deg) scale(1);
+  }
+}
+@keyframes ring-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(253, 224, 71, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(253, 224, 71, 0);
+  }
+}
+
+.wave-bar {
+  transform-origin: center;
+  transform: scaleY(0.55);
+}
+.stamp {
+  transform: rotate(-8deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bubble-in {
+    animation: bubble-in 420ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .float-slow {
+    animation: float-y 6s ease-in-out infinite;
+  }
+  .float-slower {
+    animation: float-y 8s ease-in-out 1.2s infinite;
+  }
+  .wave-bar {
+    animation: wave-bar 1.1s ease-in-out infinite;
+  }
+  .stamp-in {
+    animation: stamp-in 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .ring-pulse {
+    animation: ring-pulse 1.6s ease-out infinite;
+  }
+  .hover-tilt {
+    transition:
+      transform 220ms ease,
+      box-shadow 220ms ease;
+  }
+  .hover-tilt:hover {
+    transform: rotate(-0.8deg) translateY(-3px);
+  }
+
+  /* Sections fade up as they scroll in. Reveal.tsx only arms elements that start off-screen. */
+  .reveal-armed {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  .reveal-shown {
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 700ms ease,
+      transform 700ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
+/* ── Landing hero: the two-party call and the ribbons (off under reduced motion) ──────── */
+.call-line {
+  background-image: radial-gradient(circle, #10213a 2.5px, transparent 3px);
+  background-size: 14px 6px;
+  background-repeat: repeat-x;
+  background-position: 0 50%;
+  opacity: 0.55;
+}
+.call-line-done {
+  opacity: 0.2;
+}
+.marker {
+  position: relative;
+  white-space: nowrap;
+  z-index: 0;
+}
+.marker::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: -0.08em;
+  right: -0.08em;
+  bottom: 0.06em;
+  height: 0.42em;
+  border-radius: 0.2em;
+  background: #fde047;
+  transform: rotate(-1.2deg);
+  transform-origin: left center;
+}
+@keyframes call-flow {
+  from {
+    background-position: 0 50%;
+  }
+  to {
+    background-position: 28px 50%;
+  }
+}
+@keyframes call-flow-reverse {
+  from {
+    background-position: 28px 50%;
+  }
+  to {
+    background-position: 0 50%;
+  }
+}
+@keyframes talk-ring {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.55);
+    opacity: 0;
+  }
+}
+@keyframes marker-draw {
+  from {
+    transform: rotate(-1.2deg) scaleX(0);
+  }
+  to {
+    transform: rotate(-1.2deg) scaleX(1);
+  }
+}
+@keyframes marquee-reverse {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .call-line {
+    animation: call-flow 0.9s linear infinite;
+  }
+  .call-line-reverse {
+    animation-name: call-flow-reverse;
+  }
+  .call-line-done {
+    animation: none;
+  }
+  .talk-ring {
+    animation: talk-ring 1.4s ease-out infinite;
+  }
+  .talk-ring-late {
+    animation-delay: 0.7s;
+  }
+  .marker::before {
+    animation: marker-draw 900ms 400ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .marquee-reverse {
+    animation: marquee-reverse 40s linear infinite;
+  }
+}
+
+/* ── Landing product cards: one small looping demo each (off under reduced motion) ──────── */
+@keyframes cascade-in {
+  0%, 4% { opacity: 0; transform: translateX(18px); }
+  12%, 88% { opacity: 1; transform: translateX(0); }
+  96%, 100% { opacity: 0; transform: translateX(0); }
+}
+@keyframes stamp-loop {
+  0%, 30% { opacity: 0; transform: translateY(-50%) rotate(-6deg) scale(1.8); }
+  38%, 88% { opacity: 1; transform: translateY(-50%) rotate(-6deg) scale(1); }
+  96%, 100% { opacity: 0; transform: translateY(-50%) rotate(-6deg) scale(1); }
+}
+@keyframes bar-fill {
+  0% { width: 0; }
+  30%, 92% { width: 100%; }
+  100% { width: 100%; opacity: 0.4; }
+}
+@keyframes result-in {
+  0%, 12% { opacity: 0; transform: translateY(4px); }
+  20%, 92% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(0); }
+}
+@keyframes scan-line {
+  from { transform: translateY(-40px); }
+  to { transform: translateY(260px); }
+}
+@keyframes word-cycle {
+  0% { opacity: 0; transform: translateY(100%); }
+  6%, 30% { opacity: 1; transform: translateY(0); }
+  36%, 100% { opacity: 0; transform: translateY(-100%); }
+}
+@keyframes twinkle {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.25) rotate(18deg); }
+}
+@keyframes icon-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-3px) rotate(-4deg); }
+}
+.word-cycle:not(:first-child) {
+  opacity: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cascade-in { animation: cascade-in 7s cubic-bezier(0.2, 0.8, 0.2, 1) infinite both; }
+  .stamp-loop { animation: stamp-loop 7s cubic-bezier(0.2, 0.8, 0.2, 1) 1.2s infinite both; }
+  .bar-fill { animation: bar-fill 6s ease-out infinite both; }
+  .result-in { animation: result-in 6s ease-out infinite both; }
+  .scan-line { animation: scan-line 3.2s linear infinite; }
+  .word-cycle { animation: word-cycle 6s ease-in-out infinite both; }
+  .twinkle { animation: twinkle 2.4s ease-in-out infinite; }
+  .icon-bob { animation: icon-bob 3.6s ease-in-out infinite; }
+  .hover-tilt:hover .icon-bob { animation-duration: 1.2s; }
+}
+
+/* App: call details slide in from the right. */
+@keyframes drawer-in {
+  from { transform: translateX(32px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .drawer-in { animation: drawer-in 220ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+}
+
+/* Landing: the blinking caret in the Agent Lab prompt mock. */
+@keyframes caret-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .caret { animation: caret-blink 1s steps(1) infinite; }
+}
