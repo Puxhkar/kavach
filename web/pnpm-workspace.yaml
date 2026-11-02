@@ -1,0 +1,10 @@
+# Makes web/ its own pnpm root. Without this file pnpm walks up the directory tree and
+# installs into the first pnpm-workspace.yaml it finds (on this machine: the home folder).
+packages:
+  - "."
+
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
+  "@tailwindcss/oxide": true
+  esbuild: true
