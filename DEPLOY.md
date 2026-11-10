@@ -1,9 +1,11 @@
 # Deploying Kavach
 
-**Quickest: Render (free).** Render → New → Blueprint → pick this repo. `render.yaml` creates both
-services; paste `LLM_API_KEY` (Groq) and `GNANI_API_KEY` when Render asks. The site lives at
-https://kavach-puxhkar.onrender.com. Free services sleep after 15 minutes idle; the first visit
-after that takes about a minute.
+**Quickest: Render (free).** Render → New → Blueprint → pick this repo. `render.yaml` creates one
+service that runs the website and the API together (root `Dockerfile` + `start.sh`); paste
+`LLM_API_KEY` (Groq) and `GNANI_API_KEY` when Render asks. The site lives at
+https://kavach-puxhkar.onrender.com. Free services sleep after 15 minutes idle and take about a
+minute to wake, so `.github/workflows/keep-warm.yml` pings the site every 10 minutes. One service
+awake all month (~744 hours) fits the free plan's 750 hours; two would not.
 
 The Railway + Vercel setup below works the same way on paid plans.
 

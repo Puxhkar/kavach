@@ -1,15 +1,20 @@
-# Render Blueprint: New → Blueprint → pick this repo. Creates the backend and the website
-# on the free plan. The two secrets (LLM_API_KEY, GNANI_API_KEY) are asked for in Render's
-# dashboard during setup — they are never stored in this repo.
+# Render Blueprint: New → Blueprint → pick this repo. Creates one free web service that runs
+# both the website and the API (see Dockerfile and start.sh). One service, kept warm by
+# .github/workflows/keep-warm.yml, fits the free plan's 750 hours a month; two would not.
+# The two secrets (LLM_API_KEY, GNANI_API_KEY) are asked for in Render's dashboard during
+# setup — they are never stored in this repo.
 services:
   - type: web
-    name: kavach-api-puxhkar
+    name: kavach-puxhkar
     runtime: docker
     plan: free
-    dockerfilePath: ./services/narada/Dockerfile
-    dockerContext: ./services/narada
-    healthCheckPath: /health
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
     envVars:
+      # The browser calls the site's own address; the site forwards /api/v1 to the API.
+      - key: NEXT_PUBLIC_NARADA_URL
+        value: https://kavach-puxhkar.onrender.com
       - key: STORAGE_BACKEND
         value: memory
       - key: LLM_BASE_URL
@@ -27,22 +32,7 @@ services:
         value: "1"
       - key: GNANI_MAX_PARALLEL_REQUESTS
         value: "1"
-      # The website's public address (Render serves each service at <name>.onrender.com).
-      - key: CORS_ORIGINS
-        value: https://kavach-puxhkar.onrender.com
       - key: LLM_API_KEY
         sync: false
       - key: GNANI_API_KEY
         sync: false
-
-  - type: web
-    name: kavach-puxhkar
-    runtime: docker
-    plan: free
-    dockerfilePath: ./web/Dockerfile
-    dockerContext: ./web
-    healthCheckPath: /
-    envVars:
-      # The backend's public address; baked into the site when it is built.
-      - key: NEXT_PUBLIC_NARADA_URL
-        value: https://kavach-api-puxhkar.onrender.com
