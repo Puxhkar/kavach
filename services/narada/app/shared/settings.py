@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     # "json_object" puts the schema in the instructions instead, for hosts like Groq whose
     # models don't all accept a strict schema.
     LLM_JSON_MODE: Literal["json_schema", "json_object"] = Field(default="json_schema")
+    # For "thinking" models (e.g. Groq's openai/gpt-oss-120b): how long they may think
+    # before answering. "low" keeps phone replies fast; empty sends nothing.
+    LLM_REASONING_EFFORT: str = Field(default="")
 
     # Gnani speaks both sides of a voice-mode test and transcribes the candidate.
     GNANI_API_KEY: SecretStr = Field(default=SecretStr(""))

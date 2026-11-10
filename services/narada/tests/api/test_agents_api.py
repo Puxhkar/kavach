@@ -149,3 +149,23 @@ async def test_pasting_a_prompt_creates_an_agent_ready_to_test(client):
         app.state.llm = None
     no_llm = await client.post("/api/v1/agents/quick", json={"prompt": "Hello"})
     assert no_llm.status_code == 503 and no_llm.json()["detail"] == "llm_not_configured"
+
+
+async def test_a_failing_language_model_gives_a_clear_error_not_a_crash(client):
+    from app.integrations.llm import LLMError
+    from main import app
+
+    class BrokenLLM:
+        async def reply_json(self, *args, **kwargs):
+            raise LLMError("The language model call failed: NotFoundError")
+
+    app.state.llm = BrokenLLM()
+    try:
+        resp = await client.post("/api/v1/agents/quick", json={"prompt": "Call {{name}}."})
+        assert resp.status_code == 502
+        assert resp.json() == {
+            "detail": "llm_failed",
+            "message": "The language model call failed: NotFoundError",
+        }
+    finally:
+        app.state.llm = None

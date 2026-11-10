@@ -50,10 +50,13 @@ class OpenAICompatibleLLM:
         # accept `max_completion_tokens`.
         self._max_tokens_param = settings.LLM_MAX_TOKENS_PARAM
         self._json_mode = settings.LLM_JSON_MODE
+        self._reasoning_effort = settings.LLM_REASONING_EFFORT.strip()
 
     async def _complete(
         self, system: str, messages: list[Message], max_tokens: int, **params: Any
     ) -> str:
+        if self._reasoning_effort:
+            params["extra_body"] = {"reasoning_effort": self._reasoning_effort}
         try:
             resp = await self._client.chat.completions.create(
                 model=self._model,

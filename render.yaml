@@ -15,9 +15,11 @@ services:
       - key: LLM_BASE_URL
         value: https://api.groq.com/openai/v1
       - key: LLM_MODEL
-        value: llama-3.3-70b-versatile
+        value: openai/gpt-oss-120b
       - key: LLM_JSON_MODE
         value: json_object
+      - key: LLM_REASONING_EFFORT
+        value: low
       - key: GNANI_MAX_PARALLEL_REQUESTS
         value: "1"
       # The website's public address (Render serves each service at <name>.onrender.com).

@@ -11,8 +11,8 @@ from fastapi.responses import JSONResponse
 
 from app.api.v1 import v1_router
 from app.domain.errors import DomainValidationError
-from app.integrations.llm import LLMClient
-from app.integrations.speech import SpeechClient
+from app.integrations.llm import LLMClient, LLMError
+from app.integrations.speech import SpeechClient, SpeechError
 from app.persistence.recordings import LocalRecordingStore, RecordingStore
 from app.persistence.repositories import (
     AgentRepo,
@@ -176,6 +176,19 @@ def create_app() -> FastAPI:
                 "detail": "validation_failed",
                 "errors": [{"field": e.field, "message": e.message} for e in exc.errors],
             },
+        )
+
+    @app.exception_handler(LLMError)
+    async def _llm_failed(_: Request, exc: LLMError) -> JSONResponse:
+        # The model host failed (bad key, unknown model, outage): say so instead of a bare 500.
+        logger.warning("language model call failed: %s", exc)
+        return JSONResponse(status_code=502, content={"detail": "llm_failed", "message": str(exc)})
+
+    @app.exception_handler(SpeechError)
+    async def _speech_failed(_: Request, exc: SpeechError) -> JSONResponse:
+        logger.warning("speech call failed: %s", exc)
+        return JSONResponse(
+            status_code=502, content={"detail": "speech_failed", "message": str(exc)}
         )
 
     @app.exception_handler(RequestValidationError)

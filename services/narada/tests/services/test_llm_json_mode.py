@@ -40,3 +40,22 @@ async def test_json_schema_mode_sends_a_strict_schema():
 def test_cors_origins_accept_bare_host_names():
     s = Settings(CORS_ORIGINS="kavach-web.onrender.com, http://localhost:3001/")
     assert s.cors_origins == ["https://kavach-web.onrender.com", "http://localhost:3001"]
+
+
+async def test_reasoning_effort_is_sent_only_when_set():
+    llm, sent = _llm("json_object")
+    await llm.reply("Hi", [], 20)
+    assert "extra_body" not in sent
+    llm = OpenAICompatibleLLM(
+        Settings(LLM_BASE_URL="https://llm.invalid/v1", LLM_MODEL="m", LLM_REASONING_EFFORT="low")
+    )
+    seen: dict = {}
+
+    async def create(**kwargs):
+        seen.update(kwargs)
+        message = SimpleNamespace(content="ok")
+        return SimpleNamespace(choices=[SimpleNamespace(message=message, finish_reason="stop")])
+
+    llm._client.chat.completions.create = create
+    await llm.reply("Hi", [], 20)
+    assert seen["extra_body"] == {"reasoning_effort": "low"}

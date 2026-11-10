@@ -62,6 +62,8 @@ const FRIENDLY: Record<string, string> = {
   speech_not_configured:
     "Voice tests need GNANI_API_KEY in services/narada/.env. Add it and restart the service.",
   recording_not_found: "This conversation has no recording.",
+  llm_failed: "The AI model didn't answer. Try again in a moment.",
+  speech_failed: "The voice service didn't answer. Try again in a moment.",
   validation_failed: "Some fields need fixing.",
   live_not_found: "This call has already ended.",
   call_not_found: "This call no longer exists.",
