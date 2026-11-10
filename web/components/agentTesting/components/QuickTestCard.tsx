@@ -72,9 +72,11 @@ export default function QuickTestCard() {
           </div>
         </div>
 
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-          <span className="flex items-center justify-between gap-3">Your agent&apos;s prompt<button type="button" className="cursor-pointer text-xs font-bold text-secondary-text underline underline-offset-2 hover:text-ink" onClick={() => { setPrompt(EXAMPLE_PROMPT); setPromptError(null); }} disabled={busy}>Use an example prompt</button></span>
+        {/* A div, not a <label>: a label wrapping the example button would label the button instead of the textarea. */}
+        <div className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
+          <span className="flex items-center justify-between gap-3"><label htmlFor="quick-prompt">Your agent&apos;s prompt</label><button type="button" className="cursor-pointer text-xs font-bold text-secondary-text underline underline-offset-2 hover:text-ink" onClick={() => { setPrompt(EXAMPLE_PROMPT); setPromptError(null); }} disabled={busy}>Use an example prompt</button></span>
           <textarea
+            id="quick-prompt"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             disabled={busy}
@@ -84,7 +86,7 @@ export default function QuickTestCard() {
             className={cn("min-h-44 resize-y rounded-xl border-2 bg-white px-3.5 py-3 font-mono text-[13px] leading-6 font-normal text-ink placeholder:text-secondary-text/70 focus-visible:border-ink focus-visible:ring-4 focus-visible:ring-sun/70 focus-visible:outline-none", promptError ? "border-red-500" : "border-ink/25 hover:border-ink/45")}
           />
           {promptError && <span role="alert" className="text-xs font-semibold text-red-700">{promptError}</span>}
-        </label>
+        </div>
 
         <div className="grid gap-4 sm:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
           <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
