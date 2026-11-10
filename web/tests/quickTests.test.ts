@@ -23,3 +23,11 @@ describe("quickTestIds", () => {
     expect(quickTestIds(catalog.filter((s) => !s.id.startsWith("switch-")), true)).toEqual(["language-hinglish", "injection", "noisy-line"]);
   });
 });
+
+describe("withScheme", () => {
+  it("adds https to a bare host and leaves full URLs alone", async () => {
+    const { withScheme } = await import("@/apis/utils/apiClient");
+    expect(withScheme("kavach-api.onrender.com")).toBe("https://kavach-api.onrender.com");
+    expect(withScheme("http://localhost:8010")).toBe("http://localhost:8010");
+  });
+});

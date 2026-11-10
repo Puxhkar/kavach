@@ -35,3 +35,8 @@ async def test_json_schema_mode_sends_a_strict_schema():
     await llm.reply_json("Judge it.", [], "verdict", SCHEMA, 50)
     assert sent["response_format"]["json_schema"]["strict"] is True
     assert sent["messages"][0]["content"] == "Judge it."
+
+
+def test_cors_origins_accept_bare_host_names():
+    s = Settings(CORS_ORIGINS="kavach-web.onrender.com, http://localhost:3001/")
+    assert s.cors_origins == ["https://kavach-web.onrender.com", "http://localhost:3001"]

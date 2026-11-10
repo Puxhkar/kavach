@@ -1,5 +1,12 @@
 # Deploying Kavach
 
+**Quickest: Render (free).** Render → New → Blueprint → pick this repo. `render.yaml` creates both
+services; paste `LLM_API_KEY` (Groq) and `GNANI_API_KEY` when Render asks. The site lives at
+https://kavach-puxhkar.onrender.com. Free services sleep after 15 minutes idle; the first visit
+after that takes about a minute.
+
+The Railway + Vercel setup below works the same way on paid plans.
+
 Two parts, two hosts:
 
 | Part | Host | Root directory |

@@ -98,7 +98,12 @@ export function toApiError(error: unknown): ApiError {
   return new ApiError("Something went wrong.", null, null, []);
 }
 
-export const NARADA_API_URL = `${process.env.NEXT_PUBLIC_NARADA_URL ?? "http://localhost:8010"}/api/v1`;
+/** Hosts like Render hand over a bare host name ("api.onrender.com"); calls need a scheme. */
+export function withScheme(url: string): string {
+  return /^https?:\/\//.test(url) ? url : `https://${url}`;
+}
+
+export const NARADA_API_URL = `${withScheme(process.env.NEXT_PUBLIC_NARADA_URL || "http://localhost:8010")}/api/v1`;
 
 export const naradaClient = axios.create({
   baseURL: NARADA_API_URL,

@@ -57,7 +57,9 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins(self) -> list[str]:
-        return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
+        # Hosts like Render pass a bare host name ("web.onrender.com"); browsers send a scheme.
+        origins = [o.strip().rstrip("/") for o in self.CORS_ORIGINS.split(",") if o.strip()]
+        return [o if o.startswith(("http://", "https://")) else f"https://{o}" for o in origins]
 
 
 settings = Settings()
