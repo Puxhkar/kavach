@@ -185,7 +185,7 @@ _FAMILY_EXAMPLE = (
 
 
 def drill_system(scam: CallerScenario, practicer: str, language: str, hung_up: bool) -> str:
-    checks = "\n".join(f"- {c.id}: {c.name}" for c in DRILL_CHECKS)
+    checks = "\n".join(f"- {c.id}: {c.question}" for c in DRILL_CHECKS)
     ending = (
         f"{practicer} pressed hang up themselves."
         if hung_up
@@ -195,9 +195,9 @@ def drill_system(scam: CallerScenario, practicer: str, language: str, hung_up: b
         f"You coach people to spot phone scams. {practicer} just practised against a fake "
         f"'{scam.title}' scam call (the scammer was an AI; nothing was real). Lines from "
         f"{practicer} are what speech recognition heard. {ending}\n"
-        f"Judge each check from what {practicer} actually said:\n{checks}\n"
-        "For each check give passed (true/false) and a one-sentence detail quoting what "
-        "happened. A check about sharing or paying passes when they never did it.\n"
+        f"Answer each question from what {practicer} actually said:\n{checks}\n"
+        "For each, give happened (true only if it really happened in this call) and a "
+        f"one-sentence detail quoting what {practicer} said.\n"
         f"tips: two or three short, kind, practical tips for {practicer}, in English.\n"
         "familyMessage: a short, warm message for the family WhatsApp group about how "
         f"{practicer} did and one thing to remember. Write it in {language}"
@@ -215,10 +215,10 @@ DRILL_SCHEMA: dict[str, Any] = {
                 "type": "object",
                 "properties": {
                     "id": {"type": "string", "enum": [c.id for c in DRILL_CHECKS]},
-                    "passed": {"type": "boolean"},
+                    "happened": {"type": "boolean"},
                     "detail": {"type": "string"},
                 },
-                "required": ["id", "passed", "detail"],
+                "required": ["id", "happened", "detail"],
                 "additionalProperties": False,
             },
         },

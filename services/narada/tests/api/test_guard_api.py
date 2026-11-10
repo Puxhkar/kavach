@@ -35,12 +35,12 @@ TRIAGE_MOM = {
 }
 DRILL = {
     "checks": [
-        {"id": "no_otp", "passed": True, "detail": "Never gave the OTP"},
-        {"id": "no_payment", "passed": True, "detail": "Refused to pay"},
-        {"id": "no_app", "passed": True, "detail": "No app installed"},
-        {"id": "no_details", "passed": True, "detail": "Shared nothing"},
-        {"id": "questioned", "passed": True, "detail": "Asked for the officer's ID"},
-        {"id": "ended", "passed": False, "detail": "Kept talking"},
+        {"id": "shared_otp", "happened": False, "detail": "Never gave the OTP"},
+        {"id": "paid", "happened": False, "detail": "Refused to pay"},
+        {"id": "installed_app", "happened": False, "detail": "No app installed"},
+        {"id": "shared_details", "happened": False, "detail": "Shared nothing"},
+        {"id": "questioned", "happened": True, "detail": "Asked for the officer's ID"},
+        {"id": "refused", "happened": False, "detail": "Kept talking"},
     ],
     "tips": ["Hang up and call the official number.", "Police never ask for money on calls."],
     "familyMessage": "Mummy ne aaj fake police call ko pehchaan liya!",

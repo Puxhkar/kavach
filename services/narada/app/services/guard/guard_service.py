@@ -751,7 +751,7 @@ class GuardService:
                 prompts.DRILL_SCHEMA,
                 900,
             )
-            judged = {str(c["id"]): (bool(c["passed"]), str(c["detail"])) for c in data["checks"]}
+            judged = {str(c["id"]): (bool(c["happened"]), str(c["detail"])) for c in data["checks"]}
             checks = drill_checks(judged, drill.hung_up)
             score, verdict = score_drill(checks)
             result = DrillResult(

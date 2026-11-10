@@ -27,18 +27,59 @@ from app.domain.guard.models import (
 @dataclass(frozen=True)
 class DrillCheckSpec:
     id: str
+    # Shown on the scorecard.
     name: str
+    # Asked of the model as a plain yes/no fact. Asking "did they NOT share..." made models
+    # flip the answer; the rules decide whether the fact passes.
+    question: str
     critical: bool
+    passes_if_happened: bool
 
 
 # What a drill is scored on. Critical ones are the moments money is lost.
 DRILL_CHECKS: tuple[DrillCheckSpec, ...] = (
-    DrillCheckSpec("no_otp", "Did not share an OTP, PIN or password", critical=True),
-    DrillCheckSpec("no_payment", "Did not pay or agree to pay", critical=True),
-    DrillCheckSpec("no_app", "Did not install an app or share the screen", critical=True),
-    DrillCheckSpec("no_details", "Did not share Aadhaar, PAN, bank or card details", critical=True),
-    DrillCheckSpec("questioned", "Questioned the caller or asked to verify", critical=False),
-    DrillCheckSpec("ended", "Refused firmly or hung up", critical=False),
+    DrillCheckSpec(
+        "shared_otp",
+        "Did not share an OTP, PIN or password",
+        "Did they read out or share an OTP, PIN or password?",
+        critical=True,
+        passes_if_happened=False,
+    ),
+    DrillCheckSpec(
+        "paid",
+        "Did not pay or agree to pay",
+        "Did they pay, or agree to pay or transfer money?",
+        critical=True,
+        passes_if_happened=False,
+    ),
+    DrillCheckSpec(
+        "installed_app",
+        "Did not install an app or share the screen",
+        "Did they install an app or share their screen?",
+        critical=True,
+        passes_if_happened=False,
+    ),
+    DrillCheckSpec(
+        "shared_details",
+        "Did not share Aadhaar, PAN, bank or card details",
+        "Did they share an Aadhaar, PAN, bank account or card number?",
+        critical=True,
+        passes_if_happened=False,
+    ),
+    DrillCheckSpec(
+        "questioned",
+        "Questioned the caller or asked to verify",
+        "Did they question who the caller was, or say they would verify independently?",
+        critical=False,
+        passes_if_happened=True,
+    ),
+    DrillCheckSpec(
+        "refused",
+        "Refused firmly or hung up",
+        "Did they firmly refuse the caller's demand or end the call?",
+        critical=False,
+        passes_if_happened=True,
+    ),
 )
 
 SCAM_RISK_BLOCK = 70
@@ -284,12 +325,16 @@ def inbox_order(calls: list[ScreenedCall]) -> list[ScreenedCall]:
 
 
 def drill_checks(judged: dict[str, tuple[bool, str]], hung_up: bool) -> tuple[DrillCheck, ...]:
-    """Every check in a fixed order. One the model skipped counts as failed; pressing
-    hang up passes "ended" whatever the model thought."""
+    """Every check in a fixed order, from what the model says happened. One the model
+    skipped counts as failed; pressing hang up passes "refused" whatever it thought."""
     checks = []
     for spec in DRILL_CHECKS:
-        passed, detail = judged.get(spec.id, (False, "Not assessed"))
-        if spec.id == "ended" and hung_up:
+        if spec.id in judged:
+            happened, detail = judged[spec.id]
+            passed = happened == spec.passes_if_happened
+        else:
+            passed, detail = False, "Not assessed"
+        if spec.id == "refused" and hung_up:
             passed, detail = True, "Hung up on the caller."
         checks.append(DrillCheck(spec.name, passed, detail.strip(), spec.critical))
     return tuple(checks)

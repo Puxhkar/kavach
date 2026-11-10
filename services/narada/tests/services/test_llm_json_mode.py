@@ -93,3 +93,27 @@ async def test_a_reply_that_stays_incomplete_is_a_clear_error():
     llm._client.chat.completions.create = create
     with pytest.raises(LLMError, match="incomplete"):
         await llm.reply_json("Judge.", [], "verdict", SCHEMA, 50)
+
+
+async def test_json_the_host_rejects_is_asked_for_again():
+    import httpx
+    from openai import BadRequestError
+
+    llm, _ = _llm("json_object")
+    calls = {"n": 0}
+
+    async def create(**kwargs):
+        calls["n"] += 1
+        if calls["n"] == 1:
+            req = httpx.Request("POST", "https://llm.invalid/v1/chat/completions")
+            raise BadRequestError(
+                "json_validate_failed",
+                response=httpx.Response(400, request=req),
+                body={"error": {"code": "json_validate_failed"}},
+            )
+        message = SimpleNamespace(content='{"ok": true}')
+        return SimpleNamespace(choices=[SimpleNamespace(message=message, finish_reason="stop")])
+
+    llm._client.chat.completions.create = create
+    assert await llm.reply_json("Judge.", [], "verdict", SCHEMA, 50) == {"ok": True}
+    assert calls["n"] == 2

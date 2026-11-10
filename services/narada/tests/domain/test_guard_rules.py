@@ -106,10 +106,10 @@ def test_inbox_puts_live_calls_first_then_priority_then_newest():
 
 def test_sharing_an_otp_means_scammed_whatever_else_went_well():
     judged = {
-        "no_otp": (False, "Read out the OTP"),
-        "no_payment": (True, ""),
-        "no_app": (True, ""),
-        "no_details": (True, ""),
+        "shared_otp": (True, "Read out the OTP"),
+        "paid": (False, ""),
+        "installed_app": (False, ""),
+        "shared_details": (False, ""),
         "questioned": (True, ""),
     }
     checks = drill_checks(judged, hung_up=True)
@@ -119,9 +119,9 @@ def test_sharing_an_otp_means_scammed_whatever_else_went_well():
 
 
 def test_a_skipped_check_fails_and_a_clean_drill_is_safe():
-    all_passed = {c: (True, "ok") for c in ("no_otp", "no_payment", "no_app", "no_details")}
-    checks = drill_checks({**all_passed, "questioned": (True, "ok")}, hung_up=False)
-    assert checks[-1].passed is False  # "ended" was never judged and they didn't hang up
+    safe = {c: (False, "ok") for c in ("shared_otp", "paid", "installed_app", "shared_details")}
+    checks = drill_checks({**safe, "questioned": (True, "ok")}, hung_up=False)
+    assert checks[-1].passed is False  # "refused" was never judged and they didn't hang up
     assert score_drill(checks) == (83, DrillVerdict.SAFE)
     assert score_drill(drill_checks({}, hung_up=False))[1] is DrillVerdict.SCAMMED
 

@@ -20,6 +20,10 @@ class LLMError(Exception):
     """The model call failed or returned something unusable."""
 
 
+class _BadJSONError(LLMError):
+    """The host refused the model's own reply as invalid JSON (Groq: json_validate_failed)."""
+
+
 class LLMClient(Protocol):
     async def reply(self, system: str, messages: list[Message], max_tokens: int) -> str: ...
 
@@ -65,6 +69,8 @@ class OpenAICompatibleLLM:
                 **params,
             )
         except OpenAIError as exc:
+            if "json_validate_failed" in str(exc):
+                raise _BadJSONError("The model's reply was not valid JSON") from exc
             raise LLMError(f"The language model call failed: {type(exc).__name__}") from exc
         choice = resp.choices[0]
         if choice.finish_reason == "content_filter":
@@ -99,10 +105,12 @@ class OpenAICompatibleLLM:
         problem = ""
         for _ in range(2):
             asked = messages if not problem else [*messages, {"role": "user", "content": problem}]
-            text = await self._complete(system, asked, max_tokens, response_format=response_format)
             try:
+                text = await self._complete(
+                    system, asked, max_tokens, response_format=response_format
+                )
                 data = json.loads(text)
-            except json.JSONDecodeError:
+            except (json.JSONDecodeError, _BadJSONError):
                 problem = "Your last reply was not valid JSON. Reply with only the JSON object."
                 continue
             missing = [k for k in required if not isinstance(data, dict) or k not in data]
