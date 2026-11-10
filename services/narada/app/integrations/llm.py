@@ -93,8 +93,23 @@ class OpenAICompatibleLLM:
                 "type": "json_schema",
                 "json_schema": {"name": schema_name, "strict": True, "schema": schema},
             }
-        text = await self._complete(system, messages, max_tokens, response_format=response_format)
-        try:
-            return json.loads(text)
-        except json.JSONDecodeError as exc:
-            raise LLMError(f"{schema_name}: reply was not valid JSON") from exc
+        # Strict schemas guarantee every field; plain JSON mode doesn't, so a reply that is
+        # not JSON or lacks a required top-level field gets one more try, told what was wrong.
+        required = [str(k) for k in schema.get("required", [])]
+        problem = ""
+        for _ in range(2):
+            asked = messages if not problem else [*messages, {"role": "user", "content": problem}]
+            text = await self._complete(system, asked, max_tokens, response_format=response_format)
+            try:
+                data = json.loads(text)
+            except json.JSONDecodeError:
+                problem = "Your last reply was not valid JSON. Reply with only the JSON object."
+                continue
+            missing = [k for k in required if not isinstance(data, dict) or k not in data]
+            if not missing:
+                return data
+            problem = (
+                f"Your last reply was missing: {', '.join(missing)}. "
+                "Reply with the full JSON object."
+            )
+        raise LLMError(f"{schema_name}: the model's reply was incomplete ({problem})")

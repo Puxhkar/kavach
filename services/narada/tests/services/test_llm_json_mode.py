@@ -59,3 +59,37 @@ async def test_reasoning_effort_is_sent_only_when_set():
     llm._client.chat.completions.create = create
     await llm.reply("Hi", [], 20)
     assert seen["extra_body"] == {"reasoning_effort": "low"}
+
+
+async def test_a_reply_missing_a_required_field_is_asked_for_again():
+    llm = OpenAICompatibleLLM(
+        Settings(LLM_BASE_URL="https://llm.invalid/v1", LLM_MODEL="m", LLM_JSON_MODE="json_object")
+    )
+    replies = iter(['{"name": "x"}', '{"name": "x", "ok": true}'])
+    asked: list = []
+
+    async def create(**kwargs):
+        asked.append(kwargs["messages"])
+        message = SimpleNamespace(content=next(replies))
+        return SimpleNamespace(choices=[SimpleNamespace(message=message, finish_reason="stop")])
+
+    llm._client.chat.completions.create = create
+    schema = {"type": "object", "required": ["name", "ok"]}
+    assert await llm.reply_json("Judge.", [], "verdict", schema, 50) == {"name": "x", "ok": True}
+    assert "missing: ok" in asked[1][-1]["content"]
+
+
+async def test_a_reply_that_stays_incomplete_is_a_clear_error():
+    import pytest
+
+    from app.integrations.llm import LLMError
+
+    llm, _ = _llm("json_object")
+
+    async def create(**kwargs):
+        message = SimpleNamespace(content="not json")
+        return SimpleNamespace(choices=[SimpleNamespace(message=message, finish_reason="stop")])
+
+    llm._client.chat.completions.create = create
+    with pytest.raises(LLMError, match="incomplete"):
+        await llm.reply_json("Judge.", [], "verdict", SCHEMA, 50)
