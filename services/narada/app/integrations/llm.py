@@ -43,7 +43,7 @@ class OpenAICompatibleLLM:
             # Local servers ignore the key, but the client refuses an empty one.
             api_key=settings.LLM_API_KEY.get_secret_value() or "unused",
             timeout=settings.LLM_TIMEOUT_SECONDS,
-            max_retries=2,
+            max_retries=settings.LLM_MAX_RETRIES,
         )
         self._model = settings.LLM_MODEL
         # Ollama, Gemini and gpt-4.x read `max_tokens`; OpenAI's gpt-5 and o-series only

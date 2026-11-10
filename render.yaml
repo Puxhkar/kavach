@@ -15,11 +15,16 @@ services:
       - key: LLM_BASE_URL
         value: https://api.groq.com/openai/v1
       - key: LLM_MODEL
-        value: openai/gpt-oss-120b
+        value: qwen/qwen3.8-27b
       - key: LLM_JSON_MODE
         value: json_object
       - key: LLM_REASONING_EFFORT
-        value: low
+        value: none
+      # Groq's free tier allows 8,000 tokens a minute: retry on rate limits, one call at a time.
+      - key: LLM_MAX_RETRIES
+        value: "6"
+      - key: RUN_CONCURRENCY
+        value: "1"
       - key: GNANI_MAX_PARALLEL_REQUESTS
         value: "1"
       # The website's public address (Render serves each service at <name>.onrender.com).

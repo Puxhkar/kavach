@@ -25,9 +25,11 @@ these variables (Service → Variables):
 |---|---|
 | `STORAGE_BACKEND` | `memory` (or `mongo` with a MongoDB Atlas URL in `MONGODB_CONNECTION_URL`) |
 | `LLM_BASE_URL` | `https://api.groq.com/openai/v1` |
-| `LLM_MODEL` | `openai/gpt-oss-120b` |
+| `LLM_MODEL` | `qwen/qwen3.8-27b` (plays scammers for training; `gpt-oss-120b` refuses) |
 | `LLM_JSON_MODE` | `json_object` |
-| `LLM_REASONING_EFFORT` | `low` (keeps phone replies fast) |
+| `LLM_REASONING_EFFORT` | `none` (no thinking: fast replies, fewer tokens) |
+| `LLM_MAX_RETRIES` | `6` (Groq's free tier caps tokens per minute) |
+| `RUN_CONCURRENCY` | `1` |
 | `LLM_API_KEY` | your Groq key (console.groq.com) — secret |
 | `GNANI_API_KEY` | your Gnani key — secret |
 | `CORS_ORIGINS` | your Vercel URL, e.g. `https://kavach.vercel.app` |

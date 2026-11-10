@@ -35,6 +35,9 @@ class Settings(BaseSettings):
     # For "thinking" models (e.g. Groq's openai/gpt-oss-120b): how long they may think
     # before answering. "low" keeps phone replies fast; empty sends nothing.
     LLM_REASONING_EFFORT: str = Field(default="")
+    # Retries on rate limits and server errors (the client waits as the host's Retry-After
+    # says). Raise it on free tiers with a tokens-per-minute cap, like Groq's.
+    LLM_MAX_RETRIES: int = Field(default=2, ge=0, le=10)
 
     # Gnani speaks both sides of a voice-mode test and transcribes the candidate.
     GNANI_API_KEY: SecretStr = Field(default=SecretStr(""))
